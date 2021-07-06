@@ -9,14 +9,14 @@ import torch.optim as optim
 import torch.nn as nn
 import torch
 
-mnist_test = True
+
 batch_size = 32
 path = 'mnist/'
 
-if mnist_test == True:
+
 # Load Data
-    train_data = ColorMNIST('both', 'train', path, randomcolor=True)
-    test_data = ColorMNIST('both', 'test', path, randomcolor=True)
+train_data = ColorMNIST('both', 'train', path, randomcolor=True)
+test_data = ColorMNIST('both', 'test', path, randomcolor=True)
 
 #Define Train Loader and Test Loader
 train_loader = DataLoader(
@@ -50,10 +50,10 @@ class Net(nn.Module):
         self.conv1 = nn.Conv2d(3, 16, 3, padding=1)
         #14*14*16
         self.conv2 = nn.Conv2d(16, 32, 3, padding=1)
-        #7*7*64
+        #7*7*32
         self.conv3 = nn.Conv2d(32, 64, 3, padding=1)
 
-        self.fc1 = nn.Linear(int(width*height*64/(4*2)), 10)
+        self.fc1 = nn.Linear(int(64*7*7), 1)
         self.dropout = nn.Dropout(0.25)
         self.pool = nn.MaxPool2d(2,2)
 
@@ -61,8 +61,7 @@ class Net(nn.Module):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = F.relu(self.conv3(x))
-
-        x = x.view(-1, int(width*height*64/(4*2)))
+        x = x.view(-1, int(64*7*7))
         x = self.dropout(x)
         x = F.relu(self.fc1(x))
 
@@ -73,7 +72,7 @@ model = Net()
 print(model)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.1)
+optimizer = optim.SGD(model.parameters(), lr=0.005) #Learnrate Paper
 
 model.train()
 
